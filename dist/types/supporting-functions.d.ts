@@ -1,5 +1,12 @@
-import type { TargetVariable, ChangeEvent } from './types/globals';
-import type { DataNode, ProxyNode, ProxserveInstanceMetadata } from './types/proxserve-class';
+/**
+ * 2024 Native Signals <noamlin@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ */
+import type { TargetVariable, ChangeEvent } from "./types/globals";
+import type { DataNode, ProxyNode, ProxserveInstanceMetadata } from "./types/proxserve-class";
 /**
  * Convert property name to valid path segment
  */
@@ -24,4 +31,4 @@ export declare function createNodes(parentDataNode: DataNode, property: string |
     dataNode: DataNode;
     proxyNode: ProxyNode | undefined;
 };
-export declare function stackTraceLog(dataNode: DataNode, change: ChangeEvent, logLevel?: ProxserveInstanceMetadata['trace']): void;
+export declare function stackTraceLog(dataNode: DataNode, change: ChangeEvent, logLevel?: ProxserveInstanceMetadata["trace"]): void;

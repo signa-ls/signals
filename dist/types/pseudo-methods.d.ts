@@ -1,4 +1,11 @@
-import type { StopFunction, BlockFunction, ActivateFunction, OnFunction, OnceFunction, RemoveListenerFunction, RemoveAllListenersFunction, GetProxserveNameFunction, WhoAMI, GetOriginalTargetFunction, GetProxserveNodesFunction } from './types/pseudo-methods';
+/**
+ * 2024 Native Signals <noamlin@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ */
+import type { StopFunction, BlockFunction, ActivateFunction, OnFunction, OnceFunction, RemoveListenerFunction, RemoveAllListenersFunction, GetProxserveNameFunction, WhoAMI, GetOriginalTargetFunction, GetProxserveNodesFunction } from "./types/pseudo-methods";
 export declare const stop: StopFunction;
 export declare const block: BlockFunction;
 export declare const activate: ActivateFunction;

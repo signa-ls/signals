@@ -1,5 +1,5 @@
-import { EVENT_NAMES, ChangeEvent, TargetVariable } from './globals';
-import { ProxserveInstance, DataNode, ProxyNode } from './proxserve-class';
+import type { EVENT_NAMES, ChangeEvent, TargetVariable } from "./globals";
+import type { ProxserveInstance, DataNode, ProxyNode } from "./proxserve-class";
 
 /**
  * stop object and children from emitting change events
@@ -20,7 +20,7 @@ export type ActivateFunction = (force?: boolean) => void;
 
 /**
  * add event listener on a proxy or on a descending path
- * 
+ *
  * @param args.events - event name or several event names
  * @param args.path - path selector
  * @param args.listener - listener function
@@ -28,16 +28,14 @@ export type ActivateFunction = (force?: boolean) => void;
  * @param args.options.id - identifier for removing this listener later
  * @param args.options.once - whether this listener will run only once or always
  */
-export type OnFunction = (
-	args: {
-		event: EVENT_NAMES | EVENT_NAMES[] | 'change',
-		path?: string,
-		listener: (this: ProxserveInstance, change: ChangeEvent) => void,
-		deep?: boolean;
-		id?: number | string;
-		once?: boolean;
-	},
-) => void;
+export type OnFunction = (args: {
+	event: EVENT_NAMES | EVENT_NAMES[] | "change";
+	path?: string;
+	listener: (this: ProxserveInstance, change: ChangeEvent) => void;
+	deep?: boolean;
+	id?: number | string;
+	once?: boolean;
+}) => void;
 
 /**
  * just like `on` but the listener will run only once
@@ -48,17 +46,18 @@ export type OnceFunction = OnFunction;
 /**
  * removes a listener from a path by an identifier (can have multiple listeners with the same ID)
  * or by the listener function itself
- * 
+ *
  * @param args.path - path selector
  * @param args.id - the listener(s) identifier or listener-function
  */
 export type RemoveListenerFunction = (
-	args: { path?: string, id: string | number | Function },
+	// biome-ignore lint/complexity/noBannedTypes: Function is needed
+	args: { path?: string; id: string | number | Function },
 ) => void;
 
 /**
  * removing all listeners of a path
- * 
+ *
  * @param args.path - path selector
  */
 export type RemoveAllListenersFunction = (path?: string) => void;
@@ -82,4 +81,7 @@ export type WhoAMI = () => string;
  * get the data-node of a proxy (which holds all meta data)
  * and also get proxy-node of a proxy (which holds all related objects)
  */
-export type GetProxserveNodesFunction = () => { dataNode: DataNode, proxyNode: ProxyNode };
+export type GetProxserveNodesFunction = () => {
+	dataNode: DataNode;
+	proxyNode: ProxyNode;
+};

@@ -1,5 +1,5 @@
-import { EVENT_NAMES, ChangeEvent, TargetVariable } from './globals';
-import { ProxserveInstance, DataNode, ProxyNode } from './proxserve-class';
+import type { EVENT_NAMES, ChangeEvent, TargetVariable } from "./globals";
+import type { ProxserveInstance, DataNode, ProxyNode } from "./proxserve-class";
 /**
  * stop object and children from emitting change events
  */
@@ -25,7 +25,7 @@ export type ActivateFunction = (force?: boolean) => void;
  * @param args.options.once - whether this listener will run only once or always
  */
 export type OnFunction = (args: {
-    event: EVENT_NAMES | EVENT_NAMES[] | 'change';
+    event: EVENT_NAMES | EVENT_NAMES[] | "change";
     path?: string;
     listener: (this: ProxserveInstance, change: ChangeEvent) => void;
     deep?: boolean;

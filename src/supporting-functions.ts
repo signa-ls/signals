@@ -1,32 +1,40 @@
 /**
- * 2023 Noam Lin <noamlin@gmail.com>
+ * 2024 Native Signals <noamlin@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
-"use strict"
 
-import { proxyTypes, ND, NID, EVENTS } from './globals';
-import type { TargetVariable, ListenerData, ChangeEvent } from './types/globals';
-import type { DataNode, ProxyNode, ProxserveInstanceMetadata, PseudoThis } from './types/proxserve-class';
-import { realtypeof } from './general-functions';
-import { whoami } from './pseudo-methods';
+import { proxyTypes, ND, NID, EVENTS } from "./globals";
+import type {
+	TargetVariable,
+	ListenerData,
+	ChangeEvent,
+} from "./types/globals";
+import type {
+	DataNode,
+	ProxyNode,
+	ProxserveInstanceMetadata,
+	PseudoThis,
+} from "./types/proxserve-class";
+import { realtypeof } from "./general-functions";
+import { whoami } from "./pseudo-methods";
 
 /**
  * Convert property name to valid path segment
  */
-export function property2path(obj: any, property: string|number): string {
-	if(typeof property === 'symbol') {
+export function property2path(obj: any, property: string | number): string {
+	if (typeof property === "symbol") {
 		throw new Error(`property of type "symbol" isn't path'able`);
 	}
 
 	const typeofobj = realtypeof(obj);
-	switch(typeofobj) {
-		case 'Object': {
+	switch (typeofobj) {
+		case "Object": {
 			return `.${property}`;
 		}
-		case 'Array': {
+		case "Array": {
 			return `[${property}]`;
 		}
 		default: {
@@ -50,33 +58,35 @@ export function property2path(obj: any, property: string|number): string {
 export function unproxify(value: any): any {
 	const typeofvalue = realtypeof(value);
 
-	if(proxyTypes[typeofvalue]) {
+	if (proxyTypes[typeofvalue]) {
 		let target = value;
 		try {
 			target = value.$getOriginalTarget();
-		} catch(error) {}
+		} catch (error) {}
 
-		switch(typeofvalue) {
-			case 'Object':
-				let keys = Object.keys(target);
-				for(let key of keys) {
+		switch (typeofvalue) {
+			case "Object": {
+				const keys = Object.keys(target);
+				for (const key of keys) {
 					target[key] = unproxify(target[key]); // maybe alters target and maybe returning the exact same object
 				}
 				break;
-			case 'Array':
-				for(let i=0; i < target.length; i++) {
+			}
+			case "Array": {
+				for (let i = 0; i < target.length; i++) {
 					target[i] = unproxify(target[i]); // maybe alters target and maybe returning the exact same object
 				}
 				break;
-			default:
+			}
+			default: {
 				console.warn(`Not Implemented (type of '${typeofvalue}')`);
+			}
 		}
 
 		return target;
 	}
-	else {
-		return value; // primitive
-	}
+
+	return value; // primitive
 }
 
 /**
@@ -87,19 +97,19 @@ export function createNodes(
 	parentDataNode: DataNode,
 	property: string | number,
 	parentProxyNode?: ProxyNode,
-	target?: TargetVariable,
-): { dataNode: DataNode, proxyNode: ProxyNode | undefined } {
+	target?: TargetVariable
+): { dataNode: DataNode; proxyNode: ProxyNode | undefined } {
 	//handle property path
 	let propertyPath: string;
-	if(parentProxyNode?.[ND].target) {
+	if (parentProxyNode?.[ND].target) {
 		propertyPath = property2path(parentProxyNode[ND].target, property);
 	} else {
 		propertyPath = property2path({}, property); // if parent doesn't have target then treat it as object
 	}
-	
+
 	//handle data node
 	let dataNode: DataNode = parentDataNode[property]; // try to receive existing data-node
-	if(!dataNode) {
+	if (!dataNode) {
 		dataNode = {
 			[NID]: Object.create(parentDataNode[NID]),
 			[ND]: {
@@ -108,29 +118,28 @@ export function createNodes(
 					shallow: [] as ListenerData[],
 					deep: [] as ListenerData[],
 				},
-			}
+			},
 		} as DataNode;
 		parentDataNode[property] = dataNode;
 	}
 
 	delete dataNode[NID].status; // clears old status in case a node previously existed
 	// updates path (for rare case where parent was array and then changed to object or vice versa)
-	if(!parentDataNode[ND].isTreePrototype) {
+	if (!parentDataNode[ND].isTreePrototype) {
 		Object.assign(dataNode[ND], {
 			path: parentDataNode[ND].path + propertyPath,
-			propertyPath
+			propertyPath,
 		});
-	}
-	else {
+	} else {
 		Object.assign(dataNode[ND], {
-			path: '',
-			propertyPath: ''
+			path: "",
+			propertyPath: "",
 		});
 	}
 
 	// handle proxy node
 	let proxyNode: ProxyNode | undefined;
-	if(parentProxyNode) {
+	if (parentProxyNode) {
 		proxyNode = {
 			[NID]: Object.create(parentProxyNode[NID]),
 			[ND]: {
@@ -155,85 +164,78 @@ let noStackFlag = false;
 export function stackTraceLog(
 	dataNode: DataNode,
 	change: ChangeEvent,
-	logLevel?: ProxserveInstanceMetadata['trace'],
+	logLevel?: ProxserveInstanceMetadata["trace"]
 ) {
-	if (logLevel !== 'normal' && logLevel !== 'verbose') {
+	if (logLevel !== "normal" && logLevel !== "verbose") {
 		return;
 	}
 
 	const err = new Error();
 	const stack = err.stack;
-	
+
 	if (!stack) {
 		if (!noStackFlag) {
 			// log this only once. no need to spam.
-			console.error('Can\'t log stack trace of proxserve. browser/runtime doesn\'t support Error.stack');
+			console.error(
+				"Can't log stack trace of proxserve. browser/runtime doesn't support Error.stack"
+			);
 			noStackFlag = true;
 		}
 		return;
 	}
 
 	// break stack to individual lines. each line will point to a file and function.
-	const functionsTrace = stack.split('\n').map((value) => {
+	const functionsTrace = stack.split("\n").map((value) => {
 		return value.trim();
 	});
 	// remove first and useless Error line.
-	if (functionsTrace[0].toLowerCase().indexOf('error') === 0) {
+	if (functionsTrace[0].toLowerCase().indexOf("error") === 0) {
 		functionsTrace.shift();
 	}
 	// delete this function's own line.
 	functionsTrace.shift();
 	// delete `initEmitEvent` line - overwrite it with a title.
-	functionsTrace[0] = 'Stack Trace:';
+	functionsTrace[0] = "Stack Trace:";
 
 	// log the message header.
 	const pathname = whoami.call({ dataNode } as PseudoThis) + change.path;
 	let verb = change.type;
 	if (change.type === EVENTS.shift || change.type === EVENTS.unshift) {
-		verb += 'ed';
+		verb += "ed";
 	} else {
-		verb += 'd';
+		verb += "d";
 	}
 
 	console.log(
-		'%c                                                                ',
-		'border-bottom: 1px solid #008;',
+		"%c                                                                ",
+		"border-bottom: 1px solid #008;"
 	);
 	console.log(
 		`%c${pathname} %chas been ${verb}:`,
-		'font-weight: bold; color: #008;',
-		'color: #000;',
+		"font-weight: bold; color: #008;",
+		"color: #000;"
 	);
 
 	// verbose message with assigned values
-	if (logLevel === 'verbose') {
-		if (change.type === 'splice' || change.type === 'unshift') {
+	if (logLevel === "verbose") {
+		if (change.type === "splice" || change.type === "unshift") {
 			console.log(
 				`%cArguments of ${change.type}:`,
-				'color: #555; font-style: italic;',
+				"color: #555; font-style: italic;"
 			);
 			console.log(change.args);
 		}
 
-		console.log(
-			'%cOld value was:',
-			'color: #555; font-style: italic;',
-		);
+		console.log("%cOld value was:", "color: #555; font-style: italic;");
 		console.log(change.oldValue);
-		console.log(
-			'%cNew value is:',
-			'color: #555; font-style: italic;',
-		);
+		console.log("%cNew value is:", "color: #555; font-style: italic;");
 		console.log(change.value);
 	}
 
 	// the files and lines list message
+	console.log(`%c${functionsTrace.join("\n")}`, "color: #999;");
 	console.log(
-		`%c${functionsTrace.join('\n')}`,
-		'color: #999;',
-	);
-	console.log(
-		'%c                                                                ',
-		'border-top: 1px solid #008;',
+		"%c                                                                ",
+		"border-top: 1px solid #008;"
 	);
 }

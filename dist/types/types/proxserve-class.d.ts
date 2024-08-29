@@ -1,6 +1,6 @@
-import { ND, NID, NODE_STATUSES, PROXY_STATUSES } from '../globals';
-import { TargetVariable, ListenerData, DeferredEvent } from './globals';
-import { StopFunction, BlockFunction, ActivateFunction, OnFunction, OnceFunction, RemoveListenerFunction, RemoveAllListenersFunction, GetOriginalTargetFunction, GetProxserveNodesFunction, GetProxserveNameFunction, WhoAMI } from './pseudo-methods';
+import { ND, NID, type NODE_STATUSES, type PROXY_STATUSES } from "../globals";
+import type { TargetVariable, ListenerData, DeferredEvent } from "./globals";
+import type { StopFunction, BlockFunction, ActivateFunction, OnFunction, OnceFunction, RemoveListenerFunction, RemoveAllListenersFunction, GetOriginalTargetFunction, GetProxserveNodesFunction, GetProxserveNameFunction, WhoAMI } from "./pseudo-methods";
 /** a permanent node that holds data about the "location" in the tree */
 export interface DataNode {
     [NID]: {
@@ -49,7 +49,7 @@ export interface ProxserveInstanceMetadata {
     /** delay before destroying a detached child-object */
     destroyDelay: number;
     /** stack trace log option */
-    trace: 'none' | 'normal' | 'verbose';
+    trace: "none" | "normal" | "verbose";
     dataTree: DataNode;
     proxyTree: ProxyNode;
 }

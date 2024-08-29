@@ -1,11 +1,18 @@
-import { ND, NID, NODE_STATUSES, PROXY_STATUSES } from '../globals';
-import { TargetVariable, ListenerData, DeferredEvent } from './globals';
-import {
-	StopFunction, BlockFunction, ActivateFunction,
-	OnFunction, OnceFunction,
-	RemoveListenerFunction, RemoveAllListenersFunction,
-	GetOriginalTargetFunction, GetProxserveNodesFunction, GetProxserveNameFunction, WhoAMI,
-} from './pseudo-methods';
+import { ND, NID, type NODE_STATUSES, type PROXY_STATUSES } from "../globals";
+import type { TargetVariable, ListenerData, DeferredEvent } from "./globals";
+import type {
+	StopFunction,
+	BlockFunction,
+	ActivateFunction,
+	OnFunction,
+	OnceFunction,
+	RemoveListenerFunction,
+	RemoveAllListenersFunction,
+	GetOriginalTargetFunction,
+	GetProxserveNodesFunction,
+	GetProxserveNameFunction,
+	WhoAMI,
+} from "./pseudo-methods";
 
 /** a permanent node that holds data about the "location" in the tree */
 export interface DataNode {
@@ -21,14 +28,14 @@ export interface DataNode {
 		listeners: {
 			shallow: ListenerData[];
 			deep: ListenerData[];
-		},
+		};
 		path: string;
 		propertyPath: string;
 		deferredEvents?: DeferredEvent[];
 		isTreePrototype?: boolean;
 	};
 	[childNode: string]: DataNode;
-};
+}
 
 /**
  * a node that holds data about the proxy-object
@@ -48,7 +55,7 @@ export interface ProxyNode {
 		revoke?: () => void;
 	};
 	[childNode: string]: ProxyNode;
-};
+}
 
 export interface ProxserveInstanceMetadata {
 	/** should destroy detached child-objects or deleted properties automatically */
@@ -61,15 +68,15 @@ export interface ProxserveInstanceMetadata {
 	/** delay before destroying a detached child-object */
 	destroyDelay: number;
 	/** stack trace log option */
-	trace: 'none' | 'normal' | 'verbose';
+	trace: "none" | "normal" | "verbose";
 	dataTree: DataNode;
 	proxyTree: ProxyNode;
 }
 
 export type PseudoThis = {
-	metadata: ProxserveInstanceMetadata,
-	dataNode: DataNode,
-	proxyNode: ProxyNode
+	metadata: ProxserveInstanceMetadata;
+	dataNode: DataNode;
+	proxyNode: ProxyNode;
 };
 
 export type ProxserveInstance = {
@@ -91,7 +98,7 @@ export type ProxserveInstance = {
 	getProxserveNodes: GetProxserveNodesFunction;
 
 	[property: string | number | symbol]: any;
-}
+};
 export type ProxserveInstanceAlternatives = ProxserveInstance & {
 	$stop: StopFunction;
 	$block: BlockFunction;
@@ -104,4 +111,4 @@ export type ProxserveInstanceAlternatives = ProxserveInstance & {
 	$getProxserveName: GetProxserveNameFunction;
 	$whoami: WhoAMI;
 	$getProxserveNodes: GetProxserveNodesFunction;
-}
+};

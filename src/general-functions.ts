@@ -1,25 +1,24 @@
 /**
- * 2023 Noam Lin <noamlin@gmail.com>
+ * 2024 Native Signals <noamlin@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
-"use strict"
 
-import { SomeObject, SomeArray, VariableTypes } from './types/globals';
+import type { SomeObject, SomeArray, VariableTypes } from "./types/globals";
 
 /**
  * return a string representing the full type of the variable
  */
 export function realtypeof(variable: any): VariableTypes {
-	let rawType = Object.prototype.toString.call(variable); //[object Object], [object Array], [object Number]...
+	const rawType = Object.prototype.toString.call(variable); //[object Object], [object Array], [object Number]...
 	return rawType.substring(8, rawType.length - 1) as VariableTypes;
 }
 
 /**
  * check if variable is a number or a string of a number
- * @param variable 
+ * @param variable
  */
 /*export function isNumeric(variable: any): boolean {
 	if(typeof variable === 'string' && variable === '') {
@@ -34,112 +33,117 @@ export function realtypeof(variable: any): VariableTypes {
  */
 const simpleCloneSet = new WeakSet();
 export function simpleClone(variable: any): any {
-	let typeofvar = realtypeof(variable);
+	const typeofvar = realtypeof(variable);
 
-	if(typeofvar === 'Object') {
+	if (typeofvar === "Object") {
 		const obj = variable as SomeObject;
 		simpleCloneSet.add(obj);
 		const cloned = {};
-		let keys = Object.keys(obj);
-		for(let key of keys) {
-			if(simpleCloneSet.has(obj[key])) {
+		const keys = Object.keys(obj);
+		for (const key of keys) {
+			if (simpleCloneSet.has(obj[key])) {
 				cloned[key] = obj[key];
-			}
-			else {
+			} else {
 				cloned[key] = simpleClone(obj[key]);
 			}
 		}
 		return cloned;
 	}
-	else if(typeofvar === 'Array') {
+
+	if (typeofvar === "Array") {
 		const arr = variable as SomeArray;
 		simpleCloneSet.add(arr);
 		const cloned = [] as any[];
-		for(let i = 0; i < arr.length; i++) {
-			if(simpleCloneSet.has(arr[i])) {
+		for (let i = 0; i < arr.length; i++) {
+			if (simpleCloneSet.has(arr[i])) {
 				cloned[i] = arr[i];
-			}
-			else {
+			} else {
 				cloned[i] = simpleClone(arr[i]);
 			}
 		}
 		return cloned;
 	}
-	else { // hopefully a primitive
-		if(typeofvar !== 'Undefined' && typeofvar !== 'Null' && typeofvar !== 'Boolean' && typeofvar !== 'Number'
-		&& typeofvar !== 'BigInt' && typeofvar !== 'String') {
-			console.warn(`Can't clone a variable of type ${typeofvar}`);
-		}
-		return variable;
+
+	// hopefully a primitive
+	if (
+		typeofvar !== "Undefined" &&
+		typeofvar !== "Null" &&
+		typeofvar !== "Boolean" &&
+		typeofvar !== "Number" &&
+		typeofvar !== "BigInt" &&
+		typeofvar !== "String"
+	) {
+		console.warn(`Can't clone a variable of type ${typeofvar}`);
 	}
+	return variable;
 }
 
 /**
  * splits a path to an array of properties
  * (benchmarked and is faster than regex and split())
- * @param path 
+ * @param path
  */
-export function splitPath(path: string): Array<string|number> {
-	if(typeof path !== 'string' || path === '') {
+export function splitPath(path: string): Array<string | number> {
+	if (typeof path !== "string" || path === "") {
 		return [];
 	}
-	
-	let i = 0, betweenBrackets = false, onlyDigits = false;
+
+	let i = 0;
+	let isBetweenBrackets = false;
+	let isOnlyDigits = false;
 	//loop will skip over openning '.' or '['
-	if(path[0] === '.') {
+	if (path[0] === ".") {
 		i = 1;
-	} else if(path[0] === '[') {
+	} else if (path[0] === "[") {
 		i = 1;
-		betweenBrackets = true;
-		onlyDigits = true;
+		isBetweenBrackets = true;
+		isOnlyDigits = true;
 	}
 
-	let resultsArr = [] as Array<string|number>;
-	let tmp = '';
-	for(; i < path.length; i++) {
-		let char = path[i];
+	const resultsArr = [] as Array<string | number>;
+	let tmp = "";
+	for (; i < path.length; i++) {
+		const char = path[i];
 
-		if(betweenBrackets) {
-			if(char === ']') {
-				if(onlyDigits) {
-					resultsArr.push(parseInt(tmp, 10));
+		if (isBetweenBrackets) {
+			if (char === "]") {
+				if (isOnlyDigits) {
+					resultsArr.push(Number.parseInt(tmp, 10));
 				} else {
 					resultsArr.push(tmp);
 				}
 
-				betweenBrackets = false;
-				onlyDigits = false;
-				tmp = '';
-			}
-			else {
-				if(onlyDigits) {
-					let code = char.charCodeAt(0);
-					if(code < 48 || code > 57) { //less than '0' char or greater than '9' char
-						onlyDigits = false;
+				isBetweenBrackets = false;
+				isOnlyDigits = false;
+				tmp = "";
+			} else {
+				if (isOnlyDigits) {
+					const code = char.charCodeAt(0);
+					if (code < 48 || code > 57) {
+						//less than '0' char or greater than '9' char
+						isOnlyDigits = false;
 					}
 				}
 				tmp += char;
 			}
-		}
-		else {
-			if(char === '[') {
-				betweenBrackets = true;
-				onlyDigits = true;
+		} else {
+			if (char === "[") {
+				isBetweenBrackets = true;
+				isOnlyDigits = true;
 			}
-			
+
 			//check if starting a new property but avoid special case of [prop][prop]
-			if(char === '.' || char === '[') {
-				if(tmp !== '') {
+			if (char === "." || char === "[") {
+				if (tmp !== "") {
 					resultsArr.push(tmp);
-					tmp = '';
+					tmp = "";
 				}
-			}
-			else {
+			} else {
 				tmp += char;
 			}
 		}
 	}
-	if(tmp !== '') {
+	if (tmp !== "") {
 		resultsArr.push(tmp);
 	}
 	return resultsArr;
@@ -148,30 +152,37 @@ export function splitPath(path: string): Array<string|number> {
 /**
  * evaluate a long path and return the designated object and its referred property
  */
-export function evalPath(obj: SomeObject, path: string): {
-	object: SomeObject,
-	property: string | number,
-	value: any,
+export function evalPath(
+	obj: SomeObject,
+	path: string
+): {
+	object: SomeObject;
+	property: string | number;
+	value: any;
 } {
-	if(path === '') {
+	if (path === "") {
 		return {
 			object: obj,
-			property: '',
+			property: "",
 			value: obj,
 		};
 	}
 
-	let segments = splitPath(path);
+	const segments = splitPath(path);
 	let i: number;
-	for(i = 0; i <= segments.length - 2; i++) { // iterate until one before last property because they all must exist
-		obj = obj[segments[i]];
-		if(typeof obj === 'undefined') {
+	let childObj = obj;
+
+	for (i = 0; i <= segments.length - 2; i++) {
+		// iterate until one before last property because they all must exist
+		childObj = childObj[segments[i]];
+		if (typeof childObj === "undefined") {
 			throw new Error(`Invalid path was given - "${path}"`);
 		}
 	}
+
 	return {
-		object: obj,
+		object: childObj,
 		property: segments[i],
-		value: obj[ segments[i] ],
+		value: childObj[segments[i]],
 	};
 }

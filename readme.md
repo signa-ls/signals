@@ -1,11 +1,12 @@
-# Proxserve - Proxy Observe
+# Native Signals
 
-Extremely fast and lightweight observer via proxy for two-way binding
+Extremely fast and lightweight signals via proxy for two-way binding
 
-Unopnionated observing over objects with listeners for detecting data manipulations and implementing two-way data binding
+Native javascript reimagined with unopnionated signals with objects and event listeners for detecting data manipulations and implementing two-way data binding
 
-Getting started and docs:
-[Proxserve Documentation](https://proxserve.noaml.in)
+Docs & Getting started:
+[Native Signals Documentation](https://www.signa.ls)
 
 ### License
-Proxserve is [APACHE-2.0 licensed](https://www.apache.org/licenses/LICENSE-2.0).
+
+Native Signals is [APACHE-2.0 licensed](https://www.apache.org/licenses/LICENSE-2.0).
